@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+
+specVersion: "4.0"
+metadata:
+  name: hrrpproject1
+type: application
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**
+  customTasks:
+    - name: deploy-to-abap
+      afterTask: generateCachebusterInfo
+      configuration:
+        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        target:
+          url: http://ds4-poc.sap.onecdg.corp:44300
+          client: '110'
+          destination: DS4_110_BAS
+        app:
+          name: ZHRRP_PNL
+          description: HRRP P&L Report
+          package:  ZCDG_FI
+          transport:  DS4K915571
+        exclude:
+          - /test/
+          - /localService/

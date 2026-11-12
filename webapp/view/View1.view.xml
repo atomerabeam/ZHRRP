@@ -1,0 +1,130 @@
+<mvc:View controllerName="hrrpproject1.controller.View1"
+    xmlns="sap.ui.table"
+    xmlns:rowmodes="sap.ui.table.rowmodes"
+    xmlns:m="sap.m"
+    xmlns:f="sap.f"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:mvc="sap.ui.core.mvc">
+    <f:DynamicPage id="page" fitContent="true" toggleHeaderOnTitleClick="true">
+
+        <f:title>
+            <f:DynamicPageTitle>
+                <f:heading>
+                    <m:Title text="{i18n>title}"/>
+                </f:heading>
+            </f:DynamicPageTitle>
+        </f:title>
+
+        <f:header>
+            <f:DynamicPageHeader pinnable="true">
+                <fb:FilterBar
+                    id="filterBar"
+                    useToolbar="false"
+                    showFilterConfiguration="false"
+                    showClearOnFB="true"
+                    search=".onSearch"
+                    clear=".onClear">
+                    <fb:filterGroupItems>
+
+                        <fb:FilterGroupItem name="CompanyCode" label="{i18n>fldCompanyCode}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true" mandatory="true">
+                            <fb:control>
+                                <m:Input id="inpCompanyCode" name="Bukrs" maxLength="4"
+                                    showValueHelp="true" valueHelpRequest=".onValueHelpSingle"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="FiscalYear" label="{i18n>fldFiscalYear}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true" mandatory="true">
+                            <fb:control>
+                                <m:Input id="inpFiscalYear" name="Gjahr" maxLength="4"
+                                    showValueHelp="true" valueHelpRequest=".onValueHelpSingle"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="Period" label="{i18n>fldPeriod}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true" mandatory="true">
+                            <fb:control>
+                                <m:Input id="inpPeriod" name="Poper" maxLength="2"
+                                    showValueHelp="true" valueHelpRequest=".onValueHelpSingle"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="NodeId" label="{i18n>fldNodeId}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true" mandatory="true">
+                            <fb:control>
+                                <m:Input id="inpNodeId" name="NodeId" maxLength="42"
+                                    showValueHelp="true" valueHelpRequest=".onNodeIdVH"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="ProfitCenter" label="{i18n>fldProfitCenter}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true">
+                            <fb:control>
+                                <m:MultiInput id="miProfitCenter" name="Prctr"
+                                    valueHelpRequest=".onValueHelpRange"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="CostCenter" label="{i18n>fldCostCenter}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true">
+                            <fb:control>
+                                <m:MultiInput id="miCostCenter" name="Kostl"
+                                    valueHelpRequest=".onValueHelpRange"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="Segment" label="{i18n>fldSegment}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true">
+                            <fb:control>
+                                <m:MultiInput id="miSegment" name="Segment"
+                                    valueHelpRequest=".onValueHelpRange"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                        <fb:FilterGroupItem name="Plant" label="{i18n>fldPlant}"
+                            groupName="__$INTERNAL$" visibleInFilterBar="true">
+                            <fb:control>
+                                <m:MultiInput id="miPlant" name="Werks"
+                                    valueHelpRequest=".onValueHelpRange"/>
+                            </fb:control>
+                        </fb:FilterGroupItem>
+
+                    </fb:filterGroupItems>
+                </fb:FilterBar>
+            </f:DynamicPageHeader>
+        </f:header>
+
+        <f:content>
+            <!-- Columns are added in the controller from COLUMNS, which the Excel export reuses -->
+            <TreeTable
+                id="treeTable"
+                selectionMode="None"
+                enableColumnReordering="false"
+                fixedColumnCount="1"
+                noData="{pnl>/noData}"
+                rows="{
+                    path : 'pnl>/rows',
+                  parameters : {
+                        arrayNames : ['nodes']
+                    }
+                }">
+
+                <extension>
+                    <m:OverflowToolbar>
+                        <m:Title text="{pnl>/title}"/>
+                        <m:ToolbarSpacer/>
+                        <m:Button text="{i18n>btnExport}" icon="sap-icon://excel-attachment"
+                            enabled="{= ${pnl>/count} > 0 }" press=".onExport"/>
+                    </m:OverflowToolbar>
+                </extension>
+
+                <rowMode>
+                    <rowmodes:Auto minRowCount="10"/>
+                </rowMode>
+
+            </TreeTable>
+        </f:content>
+
+    </f:DynamicPage>
+</mvc:View>
