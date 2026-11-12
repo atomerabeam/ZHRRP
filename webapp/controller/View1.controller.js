@@ -42,7 +42,7 @@ sap.ui.define([
         Poper: { control: "inpPeriod", label: "fldPeriod", required: true, vhKey: "key",
             values: () => Array.from({ length: 12 }, (_, i) => ({ key: String(i + 1).padStart(2, "0") })) },
         NodeId: { control: "inpNodeId", label: "fldNodeId", required: true, upperCase: true,
-            vhSet: "NodeIdVHSet", vhKey: "NodeId", vhText: "NodeText" },
+            vhSet: "Node_ID_VHSet", vhKey: "Hryid", vhText: "Hrytxt" },
         Prctr: { control: "miProfitCenter", label: "fldProfitCenter", multi: true,
             vhSet: "ProfitCenterVHSet", vhKey: "Prctr", vhText: "Ktext" },
         Kostl: { control: "miCostCenter", label: "fldCostCenter", multi: true,

@@ -54,7 +54,7 @@
                             groupName="__$INTERNAL$" visibleInFilterBar="true" mandatory="true">
                             <fb:control>
                                 <m:Input id="inpNodeId" name="NodeId" maxLength="42"
-                                    showValueHelp="true" valueHelpRequest=".onNodeIdVH"/>
+                                    showValueHelp="true" valueHelpRequest=".onValueHelpSingle"/>
                             </fb:control>
                         </fb:FilterGroupItem>
 
