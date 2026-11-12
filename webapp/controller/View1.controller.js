@@ -461,16 +461,15 @@ sap.ui.define([
             return { roots: aRoots, flat: aRows };
         },
 
-        onExpandAll: function () {
-  var oTable = this.byId("treeTable");
-  oTable.setBusy(true);
-  oTable.expandToLevel(20);   // any number deeper than your FSV goes
-  oTable.setBusy(false);
-},
+        onExpandAll() {
+            const iDepth = Math.max(0, ...this.getView().getModel("pnl").getProperty("/flat")
+                .map((oRow) => oRow.HierarchyLevel));
+            this.byId("treeTable").expandToLevel(iDepth + 1);
+        },
 
-onCollapseAll: function () {
-  this.byId("treeTable").collapseAll();
-},
+        onCollapseAll() {
+            this.byId("treeTable").collapseAll();
+        },
 
         onExport() {
             const oSheet = new Spreadsheet({

@@ -114,6 +114,10 @@
                     <m:OverflowToolbar>
                         <m:Title text="{pnl>/title}"/>
                         <m:ToolbarSpacer/>
+                        <m:Button text="{i18n>btnExpandAll}" icon="sap-icon://expand-all"
+                            enabled="{= ${pnl>/count} > 0 }" press=".onExpandAll"/>
+                        <m:Button text="{i18n>btnCollapseAll}" icon="sap-icon://collapse-all"
+                            enabled="{= ${pnl>/count} > 0 }" press=".onCollapseAll"/>
                         <m:Button text="{i18n>btnExport}" icon="sap-icon://excel-attachment"
                             enabled="{= ${pnl>/count} > 0 }" press=".onExport"/>
                     </m:OverflowToolbar>
