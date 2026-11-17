@@ -4,6 +4,7 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/m/MessageBox",
+    "sap/m/MessageToast",
     "sap/m/Token",
     "sap/m/Label",
     "sap/m/Text",
@@ -17,10 +18,11 @@ sap.ui.define([
     "sap/ui/comp/filterbar/FilterBar",
     "sap/ui/export/Spreadsheet",
     "sap/ui/export/library",
+    "sap/base/i18n/Localization",
     "hrrpproject1/model/formatter"
-], (Controller, JSONModel, Filter, FilterOperator, MessageBox, Token, Label, Text, SearchField, SelectDialog,
+], (Controller, JSONModel, Filter, FilterOperator, MessageBox, MessageToast, Token, Label, Text, SearchField, SelectDialog,
     StandardListItem, MColumn, ColumnListItem, UiColumn, ValueHelpDialog, FilterBar, Spreadsheet, exportLibrary,
-    formatter) => {
+    Localization, formatter) => {
     "use strict";
 
     const EdmType = exportLibrary.EdmType;
@@ -33,6 +35,7 @@ sap.ui.define([
      * vhSet / vhKey / vhText describe the search help entity set; the search help is skipped
      * (range fields: conditions only) while the entity set isn't in the service.
      * values builds a local search help list for fields without an entity set.
+     * vhFilters returns filters always sent with the search help request (search filters are added on top).
      */
     const SELECTION = {
         Bukrs: { control: "inpCompanyCode", label: "fldCompanyCode", required: true, upperCase: true,
@@ -44,13 +47,16 @@ sap.ui.define([
         NodeId: { control: "inpNodeId", label: "fldNodeId", required: true, upperCase: true,
             vhSet: "Node_ID_VHSet", vhKey: "Hryid", vhText: "Hrytxt" },
         Prctr: { control: "miProfitCenter", label: "fldProfitCenter", multi: true,
-            vhSet: "ProfitCenterVHSet", vhKey: "Prctr", vhText: "Ktext" },
+            vhSet: "PRCTR_VHSet", vhKey: "Prctr", vhText: "Ltext",
+            vhFilters: () => [new Filter("Spras", FilterOperator.EQ, Localization.getSAPLogonLanguage())] },
         Kostl: { control: "miCostCenter", label: "fldCostCenter", multi: true,
-            vhSet: "CostCenterVHSet", vhKey: "Kostl", vhText: "Ktext" },
+            vhSet: "KOSTL_VHSet", vhKey: "Kostl", vhText: "Ltext",
+            vhFilters: () => [new Filter("Spras", FilterOperator.EQ, Localization.getSAPLogonLanguage())] },
         Segment: { control: "miSegment", label: "fldSegment", multi: true,
-            vhSet: "SegmentVHSet", vhKey: "Segment", vhText: "Name" },
+            vhSet: "SEGEMENT_VHSet", vhKey: "Segment", vhText: "Name",
+            vhFilters: () => [new Filter("Langu", FilterOperator.EQ, Localization.getSAPLogonLanguage())] },
         Werks: { control: "miPlant", label: "fldPlant", multi: true,
-            vhSet: "PlantVHSet", vhKey: "Werks", vhText: "Name1" }
+            vhSet: "WERKS_VHSet", vhKey: "Werks", vhText: "Name1" }
     };
 
     /** Report columns in display order; the first one is the tree column */
@@ -286,6 +292,7 @@ sap.ui.define([
                 title: this._text(oField.label),
                 items: {
                     path: oField.values ? "/items" : "/" + oField.vhSet,
+                    filters: oField.vhFilters ? oField.vhFilters() : [],
                     template: new StandardListItem({
                         title: "{" + oField.vhKey + "}",
                         description: oField.vhText ? "{" + oField.vhText + "}" : ""
@@ -360,6 +367,7 @@ sap.ui.define([
                 oTable.setModel(this.getOwnerComponent().getModel());
                 const oBindingInfo = {
                     path: "/" + oField.vhSet,
+                    filters: oField.vhFilters ? oField.vhFilters() : [],
                     events: { dataReceived: () => oDialog.update() }
                 };
 
@@ -415,12 +423,30 @@ sap.ui.define([
                     this.byId("page").setHeaderExpanded(false);
                 },
                 error: (oError) => {
+                    // Show the backend message in the empty table instead of a popup
+                    const sMessage = this._getErrorMessage(oError) || this._text("msgLoadError");
+                    this._setResult([]);
+                    this.getView().getModel("pnl").setProperty("/noData", sMessage);
                     oTable.setBusy(false);
-                    MessageBox.error(this._text("msgLoadError"), {
-                        details: oError && oError.responseText
-                    });
+                    MessageToast.show(sMessage);
                 }
             });
+        },
+
+        /**
+         * Extracts the backend message from a failed OData request (JSON or XML error body).
+         * @param {object} oError error parameter of the read request
+         * @returns {string} backend message, or "" if there is none
+         */
+        _getErrorMessage(oError) {
+            const sBody = (oError && oError.responseText) || "";
+            try {
+                const oBody = JSON.parse(sBody);
+                return (oBody.error && oBody.error.message && oBody.error.message.value) || "";
+            } catch {
+                const aMatch = /<message[^>]*>([\s\S]*?)<\/message>/.exec(sBody);
+                return aMatch ? aMatch[1].trim() : "";
+            }
         },
 
         _setResult(aEntries) {
